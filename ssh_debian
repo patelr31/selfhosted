@@ -1,0 +1,27 @@
+To install SSH on Debian, you need to install the OpenSSH server package. The process is as follows:
+
+1. Update your package list with:
+```
+sudo apt update
+```
+
+2. Install the OpenSSH server:
+```
+sudo apt install openssh-server
+```
+
+3. After installation, check that the SSH service is running:
+```
+sudo systemctl status ssh
+```
+You should see `Active: active (running)` if it’s running.
+
+4. If the service is not active, start and enable it to run on boot:
+```
+sudo systemctl start ssh
+sudo systemctl enable ssh
+```
+
+This will install and enable SSH on Debian 9, 10, 11, or newer versions. You can now connect remotely to your Debian machine via SSH on port 22 by default.[1][2][3][4]
+
+If the Debian machine has no internet connection, you can download the openssh-server `.deb` package on another machine, transfer it over, and install it using `dpkg -i`.[5]
