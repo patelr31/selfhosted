@@ -1,0 +1,54 @@
+adduser rutul
+apt install sudo && \
+usermod -aG sudo rutul
+#
+#
+sudo apt update && \
+sudo apt upgrade && \
+sudo apt install cifs-utils -y && \
+sudo apt install build-essential -y && \
+sudo apt-get install software-properties-common -y && \
+sudo apt-get install linux-headers-$(uname -r) -y && \
+sudo apt install curl -y && \
+sudo apt install htop -y
+#
+#
+curl https://get.docker.com | sh \
+  && sudo systemctl --now enable docker
+#
+#
+sudo usermod -aG docker rutul
+#
+#
+docker volume create portainer_data
+sudo docker run -d -p 8000:8000 -p 9443:9443 --name portainer --restart=always -v /var/run/docker.sock:/var/run/docker.sock -v portainer_data:/data portainer/portainer-ce:latest
+#
+#
+##https://developer.nvidia.com/cuda-downloads?target_os=Linux&target_arch=x86_64&Distribution=Debian&target_version=12&target_type=deb_network
+wget https://developer.download.nvidia.com/compute/cuda/repos/debian12/x86_64/cuda-keyring_1.1-1_all.deb
+sudo dpkg -i cuda-keyring_1.1-1_all.deb
+sudo apt-get update
+sudo apt-get -y install cuda-toolkit-13-0
+#
+#
+sudo apt-get install -y cuda-drivers
+#
+#
+nvidia-smi
+#
+#
+sudo systemctl restart docker
+#
+#
+docker run --gpus all nvidia/cuda:12.1.1-runtime-ubuntu22.04 nvidia-smi
+#
+#
+docker run -d --gpus=all -v ollama:/root/.ollama -p 11434:11434 --name ollama ollama/ollama
+#
+#
+docker exec -it ollama ollama run deepseek-r1
+#
+#
+docker run -d -p 3000:8080 --gpus all --add-host=host.docker.internal:host-gateway -v open-webui:/app/backend/data --name open-webui --restart always ghcr.io/open-webui/open-webui:cuda
+#
+#
