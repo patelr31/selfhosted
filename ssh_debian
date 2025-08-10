@@ -25,3 +25,36 @@ sudo systemctl enable ssh
 This will install and enable SSH on Debian 9, 10, 11, or newer versions. You can now connect remotely to your Debian machine via SSH on port 22 by default.[1][2][3][4]
 
 If the Debian machine has no internet connection, you can download the openssh-server `.deb` package on another machine, transfer it over, and install it using `dpkg -i`.[5]
+
+
+If you are unable to SSH into LXC containers, common issues to check and resolve include:
+
+- Ensure the SSH server (sshd) is installed and running inside the container. You can enter the container (e.g., `pct enter `) and check with `systemctl status sshd`.[2]
+
+- Verify the connection details: Get the container's IP address using `lxc-info -n container-name -iH` or `lxc info container-name` and confirm you are using the correct IP for SSH.[1][4]
+
+- Check SSH configuration inside the container, especially in `/etc/ssh/sshd_config`:
+  - Make sure `PermitRootLogin` is set to `yes` (not commented out) if you want to log in as root.[5][1]
+  - Ensure `PasswordAuthentication` is enabled (`yes`) if you want to use passwords instead of only key-based authentication.[1][5]
+  - After making changes, restart the SSH server with `systemctl restart sshd`.[5][1]
+
+- If you get "Permission denied" even with correct passwords, you can try creating a new user with sudo privileges for SSH login, as root SSH access is often disabled or restricted by default for security reasons.[5]
+
+- Confirm network connectivity to the container's IP and that no firewall rules on the host or container are blocking SSH (port 22).
+
+- If SSH connections time out or hang, it might be related to container or kernel network issues, which might require deeper debugging of network packet handling in LXC.[3]
+
+- For Proxmox specifically, ensure you are not confused between accessing the container via Proxmox host console (`pct enter`) and direct SSH access which requires network and SSH server configuration.[5]
+
+Summarized steps to fix inability to SSH to LXC containers:
+
+1. Enter container console via host and ensure SSH server is installed and running.
+2. Check container IP and use that to SSH.
+3. Edit `/etc/ssh/sshd_config` inside container to:
+   - `PermitRootLogin yes` (remove any `#` before it).
+   - `PasswordAuthentication yes`
+4. Restart sshd service inside container.
+5. If root is denied, create a new user with sudo and try SSH with that user.
+6. Verify network connectivity and firewall rules.
+
+These are the most common and effective fixes for SSH issues with LXC containers.[2][1][5]
